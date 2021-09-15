@@ -5,8 +5,15 @@ use warp::Filter;
 pub async fn serve() {
     // GET /hello/warp => 200 OK with body "Hello, warp!"
 
-    let hello = warp::path!("hello" / String).map(|name: String| Ok(warp::reply::json(&name)));
-    let bye = warp::path!("bye" / String).map(|name: String| Ok(warp::reply::json(&name)));
+    let hello = warp::path!("hello" / String).map(|name: String| {
+        let message = format!("{}: {}", "hello", name);
+        Ok(warp::reply::json(&message))
+    });
+
+    let bye = warp::path!("bye" / String).map(|name: String| {
+        let message = format!("{}: {}", "bye", name);
+        Ok(warp::reply::json(&message))
+    });
 
     let routes = hello.or(bye);
 
