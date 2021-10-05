@@ -1,23 +1,33 @@
+use axum::{handler::get, routing::Route, Router};
+use http::{Request, Response, StatusCode, Uri};
 use std::env;
 use std::net::SocketAddr;
-use warp::Filter;
+
+async fn get_slash() {
+    // `GET /` called
+}
+
+async fn post_slash() {
+    // `POST /` called
+}
+
+async fn get_foo() {
+    // `GET /foo` called
+}
 
 pub async fn serve() {
     // GET /hello/warp => 200 OK with body "Hello, warp!"
 
-    let hello = warp::path!("hello" / String).map(|name: String| {
-        let message = format!("{}: {}", "hello", name);
-        Ok(warp::reply::json(&message))
-    });
+    let host = get_host();
+    let app = get_routes();
+    axum::Server::bind(&host)
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
+}
 
-    let bye = warp::path!("bye" / String).map(|name: String| {
-        let message = format!("{}: {}", "bye", name);
-        Ok(warp::reply::json(&message))
-    });
-
-    let routes = hello.or(bye);
-
-    warp::serve(routes).run(get_host()).await;
+fn get_routes() -> Router<Route> {
+    Router::new().route("/", get(|| async { "Hello, World!" }))
 }
 
 fn get_host() -> SocketAddr {
